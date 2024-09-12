@@ -81,3 +81,6 @@ class DataQuerier:
                     return pd.DataFrame(results)
         except pymysql.MySQLError as e:
             print(f"Error: {e}")
+    
+    def close(self):
+        self.connection.close()

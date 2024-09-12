@@ -106,3 +106,4 @@ with st.container():
     # Display the chart in Streamlit
     st.plotly_chart(complexity_fig)
 
+querier.close()

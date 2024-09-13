@@ -41,7 +41,7 @@ def wrap_text(text, length=50):
     return '<br>'.join(wrapped_lines).replace('...<br>', '...')
 
 querier = DataQuerier()
-df = querier.query("SELECT * FROM daily_problems ORDER BY date DESC", col_names = querier.col_names)
+df = querier.query("SELECT * FROM daily_problems ORDER BY date DESC")
 question_count = querier.query("SELECT COUNT(*) FROM daily_problems")
 
 # Sidebar navigation
@@ -115,7 +115,7 @@ master_query = f"""
     WHERE date BETWEEN '{start_date_str}' AND '{end_date_str}'
     AND complexity IN ({complexity_str});
 """
-df = querier.query(master_query, col_names = querier.col_names)
+df = querier.query(master_query)
 
 df_filtered = df[df['time'] >= 60]
 df_filtered = df_filtered.sort_values('date')

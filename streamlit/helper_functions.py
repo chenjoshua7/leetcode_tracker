@@ -58,9 +58,10 @@ def get_daily_question(data):
         return f"""
             <div style='margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
-            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Problem</p>
-            <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>{top_row["id"]}. {top_row["name"]}</p>
+            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Problem: {top_row["id"]}. {top_row["name"]}</p>
             <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Completion Time: {min} minutes, {sec} seconds </p>
+            <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'></p>
+            
         </div>
         """
     else:
@@ -69,4 +70,16 @@ def get_daily_question(data):
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
             <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Challenge Problem</p>
             <p>Daily Problem not completed... yet</p>
+            <p></p>
             </div>"""
+
+def get_master_query(start_date, end_date, complexity):
+    start_date_str = start_date.strftime('%Y-%m-%d')
+    end_date_str = end_date.strftime('%Y-%m-%d')
+    complexity_str = ', '.join([f"'{c}'" for c in complexity])
+  
+    return f"""
+        SELECT * FROM daily_problems
+        WHERE date BETWEEN '{start_date_str}' AND '{end_date_str}'
+        AND complexity IN ({complexity_str});
+    """

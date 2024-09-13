@@ -58,7 +58,7 @@ def get_daily_question(data):
         return f"""
             <div style='margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
-            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Challenge Problem</p>
+            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Problem</p>
             <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>{top_row["id"]}. {top_row["name"]}</p>
             <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Completion Time: {min} minutes, {sec} seconds </p>
         </div>

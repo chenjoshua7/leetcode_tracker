@@ -30,3 +30,4 @@ streak_query = f"""WITH ranked_data AS (
                     ORDER BY 
                         end_date DESC;
                     """
+                  

@@ -56,13 +56,15 @@ def get_daily_question(data):
     if top_row["date"].date() == today:
         min, sec = divmod(int(top_row["time"]), 60)
         return f"""
-            <div style='margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
+            <div style='text-align:center; margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
             <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Problem: {top_row["id"]}. {top_row["name"]}</p>
             <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Completion Time: {min} minutes, {sec} seconds </p>
-            <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'></p>
-            
-        </div>
+                <div style="display: flex; justify-content: space-between; margin:0px 50px 0px 40px">
+                    <div style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Speed: {top_row["speed"]}%</div>
+                    <div style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Memory: {top_row["memory"]}%</div>
+                </div>        
+            </div> 
         """
     else:
         return """

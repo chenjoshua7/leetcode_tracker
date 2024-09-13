@@ -76,6 +76,8 @@ def get_daily_question(data):
             </div>"""
 
 def get_master_query(start_date, end_date, complexity):
+    if not complexity:
+        complexity = ['Easy', 'Medium', 'Hard']
     start_date_str = start_date.strftime('%Y-%m-%d')
     end_date_str = end_date.strftime('%Y-%m-%d')
     complexity_str = ', '.join([f"'{c}'" for c in complexity])

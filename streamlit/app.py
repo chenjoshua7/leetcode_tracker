@@ -58,9 +58,14 @@ with st.sidebar:
 # Title and description
 st.markdown("<h1 style='text-align: center; padding-top:-10px; padding-bottom: 20px;'>LeetCode Daily Challenge Progress</h1>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>Joshua Chen</h4>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: justify; font-size: 18px; padding-left: 30px; padding-right: 30px;'>Check out my progress with LeetCode Daily Challenges, where I solve algorithmic problems to hone my problem-solving skills.</p>", unsafe_allow_html=True)
+st.markdown("""<p style='text-align: justify; font-size: 18px; padding-left: 30px; padding-right: 30px;'>     
+            Welcome to my LeetCode Daily Progress tracker. Each day, I start with the LeetCode Daily Problem 
+            to sharpen as a brain teaser and to improve my coding skills. LeetCode offers a variety of challenges 
+            focused on algorithms and data structures, which has helped me grow as a programmer. Take a look at 
+            how I’ve been progressing!
+            </p>""", unsafe_allow_html=True)
 
-space1, c1, space2, c2, space3 = st.columns([0.1,1,0.3, 1.5, 0.1]) 
+space1, c1, space2, c2, space3 = st.columns([0.2,1,0.3, 1.5, 0.2]) 
 c1.markdown(f"""
     <div style='text-align:center; margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px 10px 30px; border-radius: 15px; 
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
@@ -72,9 +77,37 @@ c1.markdown(f"""
 
 c2.markdown(daily_question, unsafe_allow_html=True)
 
-if not complexity:
-    complexity = ['Easy', 'Medium', 'Hard']
+with st.expander("About this Project", expanded=False):
+    st.markdown("""
+    **Backend:**  
+    The project uses **AWS RDS** to host a **MySQL** database, ensuring scalability and secure data storage.
     
+    **ETL Process:**  
+    The Python script automates the scraping of the Daily Question using Selenium and BeautifulSoup, gathers performance statistics, and loads the data into the database.
+    
+    **Frontend:**  
+    The user interface is built using **Streamlit**, providing an interactive and intuitive platform for visualizing the data.
+    </br>
+    </br>
+    All code can be found in the repository link in the sidebar.
+    """, unsafe_allow_html = True)
+
+skills = df['skills'].str.split(',').explode().str.strip().unique()
+# Create a dictionary to store the count of each skill
+skill_counts = {}
+
+# Loop through each unique skill
+for skill in skills:
+    # Count the number of rows that contain the skill
+    count = df['skills'].apply(lambda x: skill in x).sum()
+    skill_counts[skill] = count
+
+skill_count_df = pd.DataFrame(list(skill_counts.items()), columns=['Skill', 'Count']).sort_values("Count", ascending=False)
+skill_bar = px.bar(data_frame=skill_count_df, x='Skill', y='Count', title="Skill Frequency")
+
+# Display the Plotly chart in Streamlit
+st.plotly_chart(skill_bar)
+
 # Querying data from filters:
 master_query = get_master_query(start_date, end_date, complexity)
 df = querier.query(master_query)

@@ -5,44 +5,21 @@ import plotly.express as px
 import webbrowser
 from datetime import timedelta
 
-from etl import ETL, DataQuerier
-import re
-
-def wrap_text(text, length=50):
-    # Split text without breaking words unless necessary, handling ellipses and dashes
-    words = re.split(r'(\s+)', text)  # Split by whitespace, keeping it as separators
-    wrapped_lines = []
-    current_line = []
-
-    for word in words:
-        # If adding the next word exceeds the length, wrap it
-        if sum(len(w) for w in current_line) + len(word) > length:
-            # Handle long words with dashes that exceed the length
-            if '-' in word and len(word) > length:
-                parts = word.split('-')
-                for part in parts:
-                    if current_line and sum(len(w) for w in current_line) + len(part) > length:
-                        wrapped_lines.append(''.join(current_line))
-                        current_line = [part + '-']
-                    else:
-                        current_line.append(part + '-')
-                current_line[-1] = current_line[-1].rstrip('-')  # remove last dash
-            else:
-                wrapped_lines.append(''.join(current_line))
-                current_line = [word]
-        else:
-            current_line.append(word)
-
-    # Add any remaining content
-    if current_line:
-        wrapped_lines.append(''.join(current_line))
-
-    # Join lines with <br> and avoid breaking ellipses
-    return '<br>'.join(wrapped_lines).replace('...<br>', '...')
+from etl import DataQuerier
+from helper_functions import wrap_text, get_current_streak, get_daily_question
+from queries import streak_query
 
 querier = DataQuerier()
 df = querier.query("SELECT * FROM daily_problems ORDER BY date DESC")
 question_count = querier.query("SELECT COUNT(*) FROM daily_problems")
+streaks = querier.query(streak_query)
+
+# Get streak data
+current_streak = get_current_streak(streaks)
+max_streak = max(streaks["streak_length"])
+
+# Daily question info
+daily_question = get_daily_question(df)
 
 # Sidebar navigation
 with st.sidebar:
@@ -72,22 +49,15 @@ st.markdown("<p style='text-align: justify; font-size: 18px; padding-left: 30px;
 
 c1, c2 = st.columns([1, 1.2]) 
 c1.markdown(f"""
-    <div style='margin: auto; margin-bottom: 20px; width:80%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
+    <div style='margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px 10px 30px; border-radius: 15px; 
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
         <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Total Completed: {question_count.iloc[0,0]}</p>
-        <p style='font-size: 14px; color: #dddddd; margin-bottom: 5px;'>Current Streak: {"10 days"}</p>
-        <p style='font-size: 14px; color: #dddddd;'>Longest Streak: {"30 days"}</p>
+        <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Current Streak: {current_streak} days</p>
+        <p style='font-size: 15px; color: #dddddd;'>Longest Streak: {max_streak} days</p>
     </div>
     """, unsafe_allow_html=True)
 
-c2.markdown(f"""
-    <div style='margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
-                box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
-        <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Challenge Problem</p>
-        <p style='font-size: 14px; color: #dddddd; margin-bottom: 5px;'>Current Streak: {"10 days"}</p>
-        <p style='font-size: 14px; color: #dddddd;'>Longest Streak: {"30 days"}</p>
-    </div>
-    """, unsafe_allow_html=True)
+c2.markdown(daily_question, unsafe_allow_html=True)
 
 
 # Expander for filters on top of the chart
@@ -143,9 +113,6 @@ with st.container():
     )
 
     st.plotly_chart(fig)
-
-
-
 
 complexity_counts = df.groupby("complexity").size()
 

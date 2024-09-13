@@ -9,6 +9,7 @@ from etl import ETL, DataQuerier
 
 querier = DataQuerier()
 df = querier.query("SELECT * FROM daily_problems ORDER BY date DESC", col_names = querier.col_names)
+question_count = querier.query("SELECT COUNT(*) FROM daily_problems")
 
 # Sidebar navigation
 with st.sidebar:
@@ -36,22 +37,22 @@ st.markdown("<h1 style='text-align: center; padding-top:-10px; padding-bottom: 2
 st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>Joshua Chen</h4>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: justify; font-size: 18px; padding-left: 30px; padding-right: 30px;'>Check out my progress with LeetCode Daily Challenges, where I solve algorithmic problems to hone my problem-solving skills.</p>", unsafe_allow_html=True)
 
-c1, c2 = st.columns(2)
+c1, c2 = st.columns([1, 1.2]) 
 c1.markdown(f"""
-    <div style='margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
+    <div style='margin: auto; margin-bottom: 20px; width:80%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
-        <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 10px;'>Total Daily Problems Completed: {500}</p>
-        <p style='font-size: 12px; color: #dddddd; margin-bottom: 5px;'>Current Streak: {"10 days"}</p>
-        <p style='font-size: 12px; color: #dddddd;'>Longest Streak: {"30 days"}</p>
+        <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Total Completed: {question_count.iloc[0,0]}</p>
+        <p style='font-size: 14px; color: #dddddd; margin-bottom: 5px;'>Current Streak: {"10 days"}</p>
+        <p style='font-size: 14px; color: #dddddd;'>Longest Streak: {"30 days"}</p>
     </div>
     """, unsafe_allow_html=True)
 
 c2.markdown(f"""
     <div style='margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
-        <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 10px;'>Today's Daily Challenge Problem</p>
-        <p style='font-size: 12px; color: #dddddd; margin-bottom: 5px;'>Current Streak: {"10 days"}</p>
-        <p style='font-size: 12px; color: #dddddd;'>Longest Streak: {"30 days"}</p>
+        <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Challenge Problem</p>
+        <p style='font-size: 14px; color: #dddddd; margin-bottom: 5px;'>Current Streak: {"10 days"}</p>
+        <p style='font-size: 14px; color: #dddddd;'>Longest Streak: {"30 days"}</p>
     </div>
     """, unsafe_allow_html=True)
 

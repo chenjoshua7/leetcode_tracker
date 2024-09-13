@@ -6,6 +6,39 @@ import webbrowser
 from datetime import timedelta
 
 from etl import ETL, DataQuerier
+import re
+
+def wrap_text(text, length=50):
+    # Split text without breaking words unless necessary, handling ellipses and dashes
+    words = re.split(r'(\s+)', text)  # Split by whitespace, keeping it as separators
+    wrapped_lines = []
+    current_line = []
+
+    for word in words:
+        # If adding the next word exceeds the length, wrap it
+        if sum(len(w) for w in current_line) + len(word) > length:
+            # Handle long words with dashes that exceed the length
+            if '-' in word and len(word) > length:
+                parts = word.split('-')
+                for part in parts:
+                    if current_line and sum(len(w) for w in current_line) + len(part) > length:
+                        wrapped_lines.append(''.join(current_line))
+                        current_line = [part + '-']
+                    else:
+                        current_line.append(part + '-')
+                current_line[-1] = current_line[-1].rstrip('-')  # remove last dash
+            else:
+                wrapped_lines.append(''.join(current_line))
+                current_line = [word]
+        else:
+            current_line.append(word)
+
+    # Add any remaining content
+    if current_line:
+        wrapped_lines.append(''.join(current_line))
+
+    # Join lines with <br> and avoid breaking ellipses
+    return '<br>'.join(wrapped_lines).replace('...<br>', '...')
 
 querier = DataQuerier()
 df = querier.query("SELECT * FROM daily_problems ORDER BY date DESC", col_names = querier.col_names)
@@ -86,6 +119,7 @@ df = querier.query(master_query, col_names = querier.col_names)
 
 df_filtered = df[df['time'] >= 60]
 df_filtered = df_filtered.sort_values('date')
+df_filtered['notes'] = df_filtered['notes'].apply(wrap_text)
 
 with st.container():    
     try:

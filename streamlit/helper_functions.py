@@ -58,7 +58,7 @@ def get_daily_question(data):
         return f"""
             <div style='text-align:center; margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
-            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Problem: {top_row["id"]}. {top_row["name"]}</p>
+            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Problem: {top_row["id"]}. {top_row["name"]}</p>
             <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Completion Time: {min} minutes, {sec} seconds </p>
                 <div style="display: flex; justify-content: space-between; margin:0px 50px 0px 40px">
                     <div style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Speed: {top_row["speed"]}%</div>
@@ -70,7 +70,7 @@ def get_daily_question(data):
         return """
             <div style='margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px; border-radius: 15px; 
                 box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
-            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Daily Challenge Problem</p>
+            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Today's Problem</p>
             <p>Daily Problem not completed... yet</p>
             <p></p>
             </div>"""

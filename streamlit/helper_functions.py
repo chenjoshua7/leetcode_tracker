@@ -75,15 +75,24 @@ def get_daily_question(data):
             <p></p>
             </div>"""
 
-def get_master_query(start_date, end_date, complexity):
-    if not complexity:
-        complexity = ['Easy', 'Medium', 'Hard']
-    start_date_str = start_date.strftime('%Y-%m-%d')
-    end_date_str = end_date.strftime('%Y-%m-%d')
-    complexity_str = ', '.join([f"'{c}'" for c in complexity])
-  
+def create_temporary_table(connection, start_date, end_date, complexity)-> None:
+    with connection.cursor() as cursor:
+        if not complexity:
+            complexity = ['Easy', 'Medium', 'Hard']
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+        complexity_str = ', '.join([f"'{c}'" for c in complexity])
+        
+        create_temp_table= f"""
+            CREATE TEMPORARY TABLE filtered_data AS
+                SELECT * FROM daily_problems
+                WHERE date BETWEEN '{start_date_str}' AND '{end_date_str}'
+                AND complexity IN ({complexity_str});
+        """
+        cursor.execute(create_temp_table)
+        connection.commit()
+        
+def get_master_query():
     return f"""
-        SELECT * FROM daily_problems
-        WHERE date BETWEEN '{start_date_str}' AND '{end_date_str}'
-        AND complexity IN ({complexity_str});
+        SELECT * FROM filtered_data
     """

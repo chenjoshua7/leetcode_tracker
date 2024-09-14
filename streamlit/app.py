@@ -1,12 +1,14 @@
 import streamlit as st
 
 import pandas as pd
+import numpy as np
+
 import plotly.express as px
 import webbrowser
 from datetime import timedelta
 
 from etl import DataQuerier
-from helper_functions import wrap_text, get_current_streak, get_daily_question, get_master_query
+from helper_functions import wrap_text, get_current_streak, get_daily_question, get_master_query, create_temporary_table
 from queries import streak_query
 
 # Wide Layout
@@ -39,6 +41,8 @@ with st.sidebar:
         
     st.markdown("<h1 style='text-align: center; padding: 20px 0;'>Navigation</h1>", unsafe_allow_html=True)
     
+    ## Create the temporary table based off of filters
+    create_temporary_table(querier.connection, start_date, end_date, complexity)
     
     # Create columns for better alignment of buttons
     col1 = st.columns(1)
@@ -56,7 +60,7 @@ with st.sidebar:
     st.markdown("<p style='margin-top: 0px;'>Repo: <a href='https://github.com/chenjoshua7/leetcode_tracker'>/chenjoshua7/leetcode_tracker</a></p>", unsafe_allow_html=True)
     
 # Title and description
-st.markdown("<h1 style='text-align: center; padding-top:-10px; padding-bottom: 20px;'>LeetCode Daily Challenge Progress</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; padding-top:-10px; padding-bottom: 20px;'>LeetCode Daily Problem Progress</h1>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>Joshua Chen</h4>", unsafe_allow_html=True)
 st.markdown("""<p style='text-align: justify; font-size: 18px; padding-left: 30px; padding-right: 30px;'>     
             Welcome to my LeetCode Daily Progress tracker. Each day, I start with the LeetCode Daily Problem 
@@ -92,29 +96,87 @@ with st.expander("About this Project", expanded=False):
     All code can be found in the repository link in the sidebar.
     """, unsafe_allow_html = True)
 
-skills = df['skills'].str.split(',').explode().str.strip().unique()
-# Create a dictionary to store the count of each skill
-skill_counts = {}
-
-# Loop through each unique skill
-for skill in skills:
-    # Count the number of rows that contain the skill
-    count = df['skills'].apply(lambda x: skill in x).sum()
-    skill_counts[skill] = count
-
-skill_count_df = pd.DataFrame(list(skill_counts.items()), columns=['Skill', 'Count']).sort_values("Count", ascending=False)
-skill_bar = px.bar(data_frame=skill_count_df, x='Skill', y='Count', title="Skill Frequency")
-
-# Display the Plotly chart in Streamlit
-st.plotly_chart(skill_bar)
 
 # Querying data from filters:
-master_query = get_master_query(start_date, end_date, complexity)
+master_query = get_master_query()
 df = querier.query(master_query)
 
 df_filtered = df[df['time'] >= 60]
 df_filtered = df_filtered.sort_values('date')
 df_filtered['notes'] = df_filtered['notes'].apply(wrap_text)
+
+skills = df['skills'].str.split(',').explode().str.strip().unique()
+# Create a dictionary to store the count of each skill
+skill_counts = {}
+skill_averages = {}
+
+# Loop through each unique skill
+for skill in skills:
+    # Count the number of rows that contain the skill
+    count = df['skills'].apply(lambda x: skill in x).sum()
+    filtered_df = df_filtered[df_filtered['skills'].apply(lambda x: skill in x)]
+
+    average = filtered_df['time'].mean()
+    if average is not np.nan:
+        skill_averages[skill] = average
+    skill_counts[skill] = count
+
+st.markdown("## Skills Section")
+
+#with st.expander("Skills Section", expanded = False):
+with st.container():
+    # Create two columns for the main layout, allocating more space for column 1
+    c1, space, c2 = st.columns([2, 0.25, 1.75])
+
+    # Create a DataFrame for skill counts and plot the bar chart
+    skill_count_df = pd.DataFrame(list(skill_counts.items()), columns=['Skill', 'Count']).sort_values("Count", ascending=False)
+    skill_bar_count = px.bar(
+        data_frame=skill_count_df, 
+        x='Skill', 
+        y='Count', 
+        title="Skill Frequency",
+        height=500  # Adjusting the height of the first plot
+    )
+    c1.plotly_chart(skill_bar_count)
+
+    # Create a DataFrame for skill averages
+    skill_averages_df = pd.DataFrame(list(skill_averages.items()), columns=['Skill', 'Averages']).sort_values("Averages", ascending=True)
+
+    # Create containers within the second column for "rows"
+    with c2:
+        # Create a container for the top skills chart with reduced margins
+        with st.container():
+            top_skills_df = skill_averages_df.iloc[:5]
+            skill_bar_top = px.bar(
+                data_frame=top_skills_df, 
+                x='Averages', 
+                y='Skill', 
+                title="Top Skills", 
+                orientation="h",
+                color_discrete_sequence=["green"],
+                height=250 
+            ).update_layout(
+                margin=dict(l=10, r=10, t=30, b=0), 
+                title={'y': 0.9} 
+            )
+            st.plotly_chart(skill_bar_top)
+
+        # Create a container for the needs practice chart with reduced margins
+        with st.container():
+            needs_practice_df = skill_averages_df.iloc[-5:]
+            skill_bar_needs_practice = px.bar(
+                data_frame=needs_practice_df, 
+                x='Averages', 
+                y='Skill', 
+                title="Needs Practice", 
+                orientation="h",
+                color_discrete_sequence=["red"],
+                height=250
+            ).update_layout(
+                margin=dict(l=10, r=10, t=10, b=10),
+                title={'y': 1}
+            )
+            st.plotly_chart(skill_bar_needs_practice)
 
 with st.container():    
     try:

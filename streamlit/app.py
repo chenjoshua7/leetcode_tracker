@@ -60,7 +60,14 @@ with st.sidebar:
     st.markdown("<p style='margin-top: 0px;'>Repo: <a href='https://github.com/chenjoshua7/leetcode_tracker'>/chenjoshua7/leetcode_tracker</a></p>", unsafe_allow_html=True)
     
 # Title and description
-st.markdown("<h1 style='text-align: center; padding-top:-10px; padding-bottom: 20px;'>LeetCode Daily Problem Progress</h1>", unsafe_allow_html=True)
+st.markdown("""
+    <div style="text-align: center;">
+        <a href='https://leetcode.com'>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/LeetCode_Logo_2.png" alt="LeetCode Logo">
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; padding-top:-10px; padding-bottom: 20px;'>Daily Problem Progress</h1>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>Joshua Chen</h4>", unsafe_allow_html=True)
 st.markdown("""<p style='text-align: justify; font-size: 18px; padding-left: 30px; padding-right: 30px;'>     
             Welcome to my LeetCode Daily Progress tracker. Each day, I start with the LeetCode Daily Problem 

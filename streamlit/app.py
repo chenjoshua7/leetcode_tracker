@@ -177,7 +177,7 @@ with c2:
             title="Top Skills", 
             orientation="h",
             color_discrete_sequence=["green"],
-            height=240,
+            height=230,
             custom_data=['Skill', 'Averages_Formatted'],
         )
         
@@ -210,7 +210,7 @@ with c2:
             title="Needs Practice", 
             orientation="h",
             color_discrete_sequence=["red"],
-            height=240, 
+            height=230, 
             custom_data=['Skill', 'Averages_Formatted'], 
         )
 

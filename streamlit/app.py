@@ -142,71 +142,138 @@ with st.container():
         x='Skill', 
         y='Count', 
         title="Skill Frequency",
-        height=500  # Adjusting the height of the first plot
-    )
+        height=500,
+    ).update_layout(xaxis_title=None, )
     c1.plotly_chart(skill_bar_count)
 
     # Create a DataFrame for skill averages
     skill_averages_df = pd.DataFrame(list(skill_averages.items()), columns=['Skill', 'Averages']).sort_values("Averages", ascending=True)
 
-    # Create containers within the second column for "rows"
-    with c2:
-        # Create a container for the top skills chart with reduced margins
-        with st.container():
-            top_skills_df = skill_averages_df.iloc[:5]
-            skill_bar_top = px.bar(
-                data_frame=top_skills_df, 
-                x='Averages', 
-                y='Skill', 
-                title="Top Skills", 
-                orientation="h",
-                color_discrete_sequence=["green"],
-                height=250 
-            ).update_layout(
-                margin=dict(l=10, r=10, t=30, b=0), 
-                title={'y': 0.9} 
-            )
-            st.plotly_chart(skill_bar_top)
+# Function to convert seconds to "minutes and seconds" format
+def convert_seconds_to_min_sec(seconds):
+    minutes = int(seconds // 60)
+    remaining_seconds = int(seconds % 60)
+    return f"{minutes} min {remaining_seconds} sec"
 
-        # Create a container for the needs practice chart with reduced margins
-        with st.container():
-            needs_practice_df = skill_averages_df.iloc[-5:]
-            skill_bar_needs_practice = px.bar(
-                data_frame=needs_practice_df, 
-                x='Averages', 
-                y='Skill', 
-                title="Needs Practice", 
-                orientation="h",
-                color_discrete_sequence=["red"],
-                height=250
-            ).update_layout(
-                margin=dict(l=10, r=10, t=10, b=10),
-                title={'y': 1}
-            )
-            st.plotly_chart(skill_bar_needs_practice)
+def prepend_spaces(skill, max_length):
+    return skill.rjust(max_length)
 
-with st.container():    
+max_length = max(skill_averages_df['Skill'].str.len())
+#skill_averages_df['Skill'] = skill_averages_df['Skill'].apply(lambda x: prepend_spaces(x, max_length))
+
+
+# Create a new column for the formatted labels
+skill_averages_df['Averages_Formatted'] = skill_averages_df['Averages'].apply(convert_seconds_to_min_sec)
+
+# Create containers within the second column for "rows"
+with c2:
+    # Create a container for the top skills chart with reduced margins
+    with st.container():
+        top_skills_df = skill_averages_df.iloc[:5].iloc[::-1]  # Reverse the order
+        skill_bar_top = px.bar(
+            data_frame=top_skills_df, 
+            x='Averages',
+            y='Skill', 
+            title="Top Skills", 
+            orientation="h",
+            color_discrete_sequence=["green"],
+            height=240,
+            custom_data=['Skill', 'Averages_Formatted'],
+        )
+        
+        st.write("")
+        
+        skill_bar_top.update_layout(
+            margin=dict(l=10, r=10, t=30, b=0), 
+            title={'y': 1},
+            xaxis_title=None,
+            yaxis_title=None, 
+        ).update_traces(
+            hovertemplate="Skill: %{customdata[0]} <br> %{customdata[1]}"
+        ).update_xaxes(
+            showgrid=False,
+            showticklabels=False 
+        )   
+        
+        st.plotly_chart(skill_bar_top)
+
+    st.write("")
+    # Create a container for the needs practice chart with reduced margins
+    with st.container():
+        needs_practice_df = skill_averages_df.iloc[-5:]
+        
+        # Create the bar plot
+        skill_bar_needs_practice = px.bar(
+            data_frame=needs_practice_df, 
+            x='Averages',  # x-axis data
+            y='Skill',  # y-axis data
+            title="Needs Practice", 
+            orientation="h",
+            color_discrete_sequence=["red"],
+            height=240, 
+            custom_data=['Skill', 'Averages_Formatted'], 
+        )
+
+        # Update the layout and traces
+        skill_bar_needs_practice.update_layout(
+            margin=dict(l=10, r=10, t=10, b=10),
+            title={'y': 1}, 
+            xaxis_title=None,
+            yaxis_title=None, 
+        ).update_traces(
+            hovertemplate="Skill: %{customdata[0]}<br>Time: %{customdata[1]}"  # Use customdata for hovertemplate
+        ).update_xaxes(
+            showgrid=False,
+            showticklabels=False)
+        
+        # Display the figure in Streamlit
+        st.plotly_chart(skill_bar_needs_practice, use_container_width=True)
+
+
+
+
+
+
+## Time Analsysis
+
+
+st.markdown("<h2> Time Analysis </h2>", unsafe_allow_html=True)
+c1, space, c2 = st.columns([1,0.05,1])
+with c1.container():    
     try:
         fig = px.line(df_filtered, x='date', y='time',
                 title="Completion Time Over Time",
                 labels={'time': 'Time', 'date': 'Date', 'complexity': 'Complexity'},
                 hover_data={'id':True, 'name': True, 'complexity': True, 'notes': True}) 
+        
+        fig.update_traces(
+            mode="markers+lines",
+            hovertemplate=(
+                "%{customdata[0]}. %{customdata[1]}<br>"
+                "Date: %{x}<br>"
+                "Complete Time: %{y}<br>"
+                "Complexity: %{customdata[2]}<br><br>"
+                "Notes:<br>%{customdata[3]}<extra></extra>"
+            )
+        ).update_layout(
+            xaxis_title = None
+        )
     except:
         st.write("Please select a complexity")
 
-# Update traces to show complexity in the hover template
-    fig.update_traces(
-        mode="markers+lines",
-        hovertemplate=(
-            "%{customdata[0]}. %{customdata[1]}<br>"
-            "Date: %{x}<br>"
-            "Complete Time: %{y}<br>"
-            "Complexity: %{customdata[2]}<br><br>"
-            "Notes:<br>%{customdata[3]}<extra></extra>"
-        )
-    )
 
-    st.plotly_chart(fig)
+
+    c1.plotly_chart(fig)
+
+    time_hist = px.histogram(data_frame=df_filtered, x="time", nbins = 20, pattern_shape = "complexity")
+    c2.plotly_chart(time_hist)
+
+
+
+
+
+
+#### Complexity
 
 complexity_counts = df.groupby("complexity").size()
 

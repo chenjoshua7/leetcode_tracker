@@ -13,7 +13,6 @@ from skills import skills_page
 
 from helper_functions import wrap_text, get_master_query, create_temporary_table
 
-
 # Main function to display the home page
 def home_page(df_filtered):
 

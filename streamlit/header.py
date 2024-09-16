@@ -50,8 +50,7 @@ def header():
     c1.markdown(f"""
         <div style='text-align:center; margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px 10px 30px; border-radius: 15px; 
                     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
-            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Total Completed: {question_count.iloc[0,0]}</p>
-            <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Current Streak: {current_streak} days</p>
+            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Current Streak: {current_streak} days</p>
             <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>No-GPT Streak: {gpt_streak} days</p>
             <p style='font-size: 15px; color: #dddddd;'>Longest Streak: {max_streak} days</p>
         </div>

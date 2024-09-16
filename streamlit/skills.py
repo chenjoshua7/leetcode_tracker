@@ -5,11 +5,6 @@ import plotly.express as px
 from helper_functions import wrap_text
 
 def skills_page(df_filtered):
-    #Filtering and sorting data    
-    df_filtered = df_filtered[df_filtered['time'] >= 60]
-    df_filtered = df_filtered.sort_values('date')
-    df_filtered['notes'] = df_filtered['notes'].apply(wrap_text)
-
     skills = df_filtered['skills'].str.split(',').explode().str.strip().unique()
     # Create a dictionary to store the count of each skill
     skill_counts = {}
@@ -26,7 +21,10 @@ def skills_page(df_filtered):
             skill_averages[skill] = average
         skill_counts[skill] = count
 
-    st.markdown("## Skills Section")
+    st.markdown("<h2 style='text-align: center; padding-bottom: 10px;'>Skills Breakdown</h2>", unsafe_allow_html = True)
+    st.markdown("""
+                LeetCode has been an great resource in building my understanding of data structures and algorithms. By analyzing my performance across different skills, particularly in relation to completion time, I can identify which areas take me longer to solve and which skills I find more challenging. This breakdown provides valuable insights into my strengths and areas for improvement, helping me target specific skills for further practice.
+                """)
 
     #with st.expander("Skills Section", expanded = False):
     with st.container():
@@ -53,16 +51,9 @@ def skills_page(df_filtered):
         remaining_seconds = int(seconds % 60)
         return f"{minutes} min {remaining_seconds} sec"
 
-    def prepend_spaces(skill, max_length):
-        return skill.rjust(max_length)
-
-    max_length = max(skill_averages_df['Skill'].str.len())
-    #skill_averages_df['Skill'] = skill_averages_df['Skill'].apply(lambda x: prepend_spaces(x, max_length))
-
-
     # Create a new column for the formatted labels
     skill_averages_df['Averages_Formatted'] = skill_averages_df['Averages'].apply(convert_seconds_to_min_sec)
-
+    
     # Create containers within the second column for "rows"
     with c2:
         # Create a container for the top skills chart with reduced margins
@@ -94,7 +85,7 @@ def skills_page(df_filtered):
             )   
             
             st.plotly_chart(skill_bar_top)
-
+        
         st.write("")
         # Create a container for the needs practice chart with reduced margins
         with st.container():

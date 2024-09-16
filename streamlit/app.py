@@ -19,7 +19,7 @@ with st.container():
 
 # Load the appropriate page based on the selection
 if page_selection == "Home":
-    home_page()
+    home_page(df_filtered)
 elif page_selection == "Completion Time Breakdown":
     time_page(df_filtered)
 elif page_selection == "Skills Breakdown":

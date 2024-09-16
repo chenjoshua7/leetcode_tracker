@@ -15,14 +15,16 @@ df_filtered = sidebar()
 header()
 
 with st.container():
-    page_selection = st.selectbox("", ["Completion Breakdown", "Skills Breakdown", "Input Data"], index=0)
+    page_selection = st.selectbox("", ["Home", "Completion Time Breakdown", "Skills Breakdown", "Daily Problem Tracker"], index=0)
 
 # Load the appropriate page based on the selection
-if page_selection == "Completion Breakdown":
+if page_selection == "Home":
+    home_page()
+elif page_selection == "Completion Time Breakdown":
     time_page(df_filtered)
 elif page_selection == "Skills Breakdown":
     skills_page(df_filtered)
-elif page_selection == "Input Data":
+elif page_selection == "Daily Problem Tracker":
     scraper_page()
 
 with st.expander("About this Project", expanded=False):

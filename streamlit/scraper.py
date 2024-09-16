@@ -101,7 +101,7 @@ def load_into_sql(info):
 # Streamlit App
 def scraper_page():
     st.write("")
-    st.markdown("<h2 style='text-align: center; padding-bottom: 10px;'>LeetCode Daily Problem Scraper</h2>", unsafe_allow_html = True)
+    st.markdown("<h2 style='text-align: center; padding-bottom: 10px;'>Daily Problem Tracker</h2>", unsafe_allow_html = True)
 
     # Scrape today's problem
     if st.button("Start Today's Problem") and not st.session_state.finished:

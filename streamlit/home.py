@@ -6,96 +6,48 @@ import pandas as pd
 import numpy as np
 
 import plotly.express as px
-import webbrowser
-from datetime import timedelta
 
+import datetime
 from etl import DataQuerier
-from helper_functions import wrap_text, get_current_streak, get_daily_question, get_master_query, create_temporary_table
-from queries import streak_query
 
-def home_page():
-    # Set Up
+from helper_functions import wrap_text, get_master_query, create_temporary_table
+
+
+@st.cache_data(ttl=1)
+def get_filtered_table(start_date, end_date, complexity):
     querier = DataQuerier()
-    df = querier.query("SELECT * FROM daily_problems ORDER BY date DESC")
-    question_count = querier.query("SELECT COUNT(*) FROM daily_problems")
-    streaks = querier.query(streak_query)
+    create_temporary_table(querier.connection, start_date, end_date, complexity)
+    # Get data with pfilters
+    master_query = get_master_query()
+    df_filtered = querier.query(master_query)
+    querier.close()
+    return df_filtered
 
-    # Get streak data
-    current_streak = get_current_streak(streaks)
-    max_streak = max(streaks["streak_length"])
-
-    # Daily question info
-    daily_question = get_daily_question(df)
-
+# Main function to display the home page
+def home_page():
     with st.sidebar:
         st.markdown("<h1 style='text-align: center; padding: 20px 0;'>Filters</h1>", unsafe_allow_html=True)
         with st.expander("Filters", expanded=False):
             c1, c2= st.columns(2)
             with st.container():
                 # Date pickers for start and end dates
-                start_date = c1.date_input("Start Date", value=df['date'].min())
-                end_date = c2.date_input("End Date", value=df['date'].max() + timedelta(days=1))
-
+                start_date = c1.date_input("Start Date", value=datetime.date(2024, 8, 28))
+                end_date = c2.date_input("End Date", value=datetime.date.today())
+                start_date= start_date + datetime.timedelta(days= 1)
+                
             # Filter by complexity
             complexity = st.multiselect("Complexity", ['Easy', 'Medium', 'Hard'])
-            create_temporary_table(querier.connection, start_date, end_date, complexity)
+    
+    df_filtered = get_filtered_table(start_date, end_date, complexity)
 
     sidebar()
 
-    # Title and description
-    st.markdown("""
-        <div style="text-align: center;">
-            <a href='https://leetcode.com'>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/LeetCode_Logo_2.png" alt="LeetCode Logo">
-            </a>
-        </div>
-        """, unsafe_allow_html=True)
-    st.markdown("<h1 style='text-align: center; padding-top:-10px; padding-bottom: 20px;'>Daily Problem Progress</h1>", unsafe_allow_html=True)
-    st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>Joshua Chen</h4>", unsafe_allow_html=True)
-    st.markdown("""<p style='text-align: justify; font-size: 18px; padding-left: 30px; padding-right: 30px;'>     
-                Welcome to my LeetCode Daily Progress tracker. Each day, I start with the LeetCode Daily Problem 
-                to sharpen as a brain teaser and to improve my coding skills. LeetCode offers a variety of challenges 
-                focused on algorithms and data structures, which has helped me grow as a programmer. Take a look at 
-                how I’ve been progressing!
-                </p>""", unsafe_allow_html=True)
-
-    space1, c1, space2, c2, space3 = st.columns([0.2,1,0.3, 1.5, 0.2]) 
-    c1.markdown(f"""
-        <div style='text-align:center; margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px 10px 30px; border-radius: 15px; 
-                    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
-            <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Total Completed: {question_count.iloc[0,0]}</p>
-            <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>Current Streak: {current_streak} days</p>
-            <p style='font-size: 15px; color: #dddddd;'>Longest Streak: {max_streak} days</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    c2.markdown(daily_question, unsafe_allow_html=True)
-
-    with st.expander("About this Project", expanded=False):
-        st.markdown("""
-        **Backend:**  
-        The project uses **AWS RDS** to host a **MySQL** database, ensuring scalability and secure data storage.
-        
-        **ETL Process:**  
-        The Python script automates the scraping of the Daily Question using Selenium and BeautifulSoup, gathers performance statistics, and loads the data into the database.
-        
-        **Frontend:**  
-        The user interface is built using **Streamlit**, providing an interactive and intuitive platform for visualizing the data.
-        </br>
-        </br>
-        All code can be found in the repository link in the sidebar.
-        """, unsafe_allow_html = True)
-
-
-    # Querying data from filters:
-    master_query = get_master_query()
-    df = querier.query(master_query)
-
-    df_filtered = df[df['time'] >= 60]
+    #Filtering and sorting data    
+    df_filtered = df_filtered[df_filtered['time'] >= 60]
     df_filtered = df_filtered.sort_values('date')
     df_filtered['notes'] = df_filtered['notes'].apply(wrap_text)
 
-    skills = df['skills'].str.split(',').explode().str.strip().unique()
+    skills = df_filtered['skills'].str.split(',').explode().str.strip().unique()
     # Create a dictionary to store the count of each skill
     skill_counts = {}
     skill_averages = {}
@@ -103,7 +55,7 @@ def home_page():
     # Loop through each unique skill
     for skill in skills:
         # Count the number of rows that contain the skill
-        count = df['skills'].apply(lambda x: skill in x).sum()
+        count = df_filtered['skills'].apply(lambda x: skill in x).sum()
         filtered_df = df_filtered[df_filtered['skills'].apply(lambda x: skill in x)]
 
         average = filtered_df['time'].mean()
@@ -252,13 +204,9 @@ def home_page():
         c2.plotly_chart(time_hist)
 
 
-
-
-
-
     #### Complexity
 
-    complexity_counts = df.groupby("complexity").size()
+    complexity_counts = df_filtered.groupby("complexity").size()
 
     # Plot a bar chart with Plotly inside a container
     with st.container():
@@ -274,7 +222,6 @@ def home_page():
         # Display the chart in Streamlit
         st.plotly_chart(complexity_fig)
 
-    querier.close()
 
     df_filtered['datetime'] = pd.to_datetime(df_filtered['date'])  # Ensure 'date' column is in datetime format
 

@@ -40,10 +40,8 @@ def header():
     st.markdown("<h1 style='text-align: center; padding-top:-10px; padding-bottom: 20px;'>Daily Problem Progress</h1>", unsafe_allow_html=True)
     st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>Joshua Chen</h4>", unsafe_allow_html=True)
     st.markdown("""<p style='text-align: justify; font-size: 18px; padding-left: 30px; padding-right: 30px;'>     
-                Welcome to my LeetCode Daily Progress tracker. Each day, I start with the LeetCode Daily Problem 
-                to sharpen as a brain teaser and to improve my coding skills. LeetCode offers a variety of challenges 
-                focused on algorithms and data structures, which has helped me grow as a programmer. Take a look at 
-                how I’ve been progressing!
+                Welcome to my LeetCode Daily Progress tracker. This automated dashboard analyzes my performance, 
+                scrapes and tracks daily problem data, and sets benchmark goals to help improve my skills.
                 </p>""", unsafe_allow_html=True)
 
     space1, c1, space2, c2, space3 = st.columns([0.2,1,0.3, 1.5, 0.2]) 
@@ -57,3 +55,9 @@ def header():
         """, unsafe_allow_html=True)
 
     c2.markdown(daily_question, unsafe_allow_html=True)
+    
+
+""" Welcome to my LeetCode Daily Progress tracker. Each day, I start with the LeetCode Daily Problem 
+                to sharpen as a brain teaser and to improve my coding skills. LeetCode offers a variety of challenges 
+                focused on algorithms and data structures, which has helped me grow as a programmer. Take a look at 
+                how I’ve been progressing!"""

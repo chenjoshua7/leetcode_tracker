@@ -49,7 +49,7 @@ def prediction_page(df_filtered):
     """)
     
     # Load the pre-trained model pipeline
-    with open('model/pipeline_model.pkl', 'rb') as f:
+    with open('pipeline_model.pkl', 'rb') as f:
         pipeline = pickle.load(f)
 
     # Date logic: filter today's and yesterday's data

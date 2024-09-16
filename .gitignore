@@ -1,0 +1,3 @@
+## ignore pycahce
+__pycache__/
+playground.ipynb

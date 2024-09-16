@@ -3,7 +3,8 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager]
+from datetime import datetime
 
 # Webscraping Daily Problem Info from LeetCode
 class LeetCodeDailyScraper:
@@ -56,6 +57,7 @@ class GetInformation:
         self.gpt = None
         self.skills = []
         self.notes = None
+        self.start_time = None
 
     def run(self):
         self._problem_time()
@@ -68,6 +70,7 @@ class GetInformation:
 
     def _problem_time(self):
         start = time.time()
+        self.start_time = datetime.fromtimestamp(start).strftime('%Y-%m-%d %H:%M:%S')
         pausetime = 0
 
         while True:

@@ -5,8 +5,8 @@ def load_into_sql(info):
     endpoint = "leetcode.c9eq4wc6mqs0.us-east-2.rds.amazonaws.com"
     port = 3306
     username = "admin"
-    password = ""
-    database = ""
+    password = "Huahua2010!"
+    database = "leetcode"
 
     try:
         connection = pymysql.connect(
@@ -21,10 +21,10 @@ def load_into_sql(info):
             try:
                 cursor.execute("""
                     INSERT INTO daily_problems 
-                    (id, name, complexity, acceptance_rate, time, language, speed, memory, chat_gpt, skills, notes)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (id, date, name, complexity, acceptance_rate, time, language, speed, memory, chat_gpt, skills, notes)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
-                    (info.id, info.name, info.complexity, info.acceptance_rate, info.time, info.language, 
+                    (info.id, info.start_time, info.name, info.complexity, info.acceptance_rate, info.time, info.language, 
                      info.speed, info.memory, info.gpt, info.skills, info.notes)
                 )
             except pymysql.MySQLError as e:

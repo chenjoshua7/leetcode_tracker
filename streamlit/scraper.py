@@ -5,6 +5,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from sidebar import sidebar
 
@@ -15,6 +16,13 @@ class LeetCodeDailyScraper:
 
     def run(self):
         url = "https://leetcode.com/problemset/"
+        
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+        chrome_options.add_argument("--disable-gpu")  # Disable GPU usage
+        chrome_options.add_argument("--no-sandbox")  # Required for some environments
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         driver.get(url)
 

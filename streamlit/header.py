@@ -12,7 +12,6 @@ def get_data_from_db():
     question_count = querier.query("SELECT COUNT(*) FROM daily_problems")
     streaks = querier.query(streak_query)
     gpt_streaks = querier.query(streak_gpt_query)
-    st.write(gpt_streaks)
     querier.close()
     return df, question_count, streaks, gpt_streaks
 

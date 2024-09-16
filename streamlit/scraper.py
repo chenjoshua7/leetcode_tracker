@@ -100,8 +100,21 @@ def load_into_sql(info):
 
 # Streamlit App
 def scraper_page():
-    st.subheader("LeetCode Daily Problem Scraper")
+    st.write("")
+    st.markdown("<h2 style='text-align: center; padding-bottom: 10px;'>LeetCode Daily Problem Scraper</h2>", unsafe_allow_html = True)
 
+    # Scrape today's problem
+    if st.button("Start Today's Problem") and not st.session_state.finished:
+        scraper = LeetCodeDailyScraper()
+        st.session_state.daily_problem = scraper.run()
+    
+
+    st.markdown("""This functionality is not supported on Streamlit Cloud due to the lack of Selenium support, but it works seamlessly when run locally, as demonstrated in the video below. This limitation is acceptable since the application is designed for personal use, and I prefer to keep my database private.
+                For those interested in setting this up for personal use, the GitHub repository is linked in the sidebar. You can begin by following the steps in the `AWS_setup` Jupyter Notebook.
+                The error shown in the video occurs because I have already completed today's daily problem.
+                """)
+    st.video("example.mov")
+    
     if "start_time" not in st.session_state:
         st.session_state.start_time = None
     if "stop_time" not in st.session_state:
@@ -116,18 +129,9 @@ def scraper_page():
         st.session_state.finished = False
     if "timer_active" not in st.session_state:
         st.session_state.timer_active = False
-    
-    # Scrape today's problem
-    if st.button("Start Today's Problem") and not st.session_state.finished:
-        scraper = LeetCodeDailyScraper()
-        st.session_state.daily_problem = scraper.run()
-    
-    if not st.session_state.daily_problem:
-        for i in range(20):
-            st.write("")
+
             
-
-
+            
     # Display the scraped problem info if available
     if st.session_state.daily_problem:
         space1, c1, c2, c3, space2 = st.columns([0.01, 0.3, 0.2, 0.2, 0.5])
@@ -135,6 +139,7 @@ def scraper_page():
         c1.write(f"{daily_problem[0]}. {daily_problem[1]}")
         c2.write(f"Acceptance: {daily_problem[2]}%")
         c3.write(f"Complexity: {daily_problem[3]}")
+        
         st.session_state.start_time = time.time() - st.session_state.elapsed_time
         st.session_state.timer_active = True
 
@@ -142,7 +147,7 @@ def scraper_page():
     placeholder = st.empty()
 
     # Continuously update elapsed time if timer is running
-    if st.session_state.timer_active:
+    if st.session_state.timer_active and st.session_state.start_time:
         st.session_state.elapsed_time = time.time() - st.session_state.start_time
         placeholder.write(f"Elapsed time: {st.session_state.elapsed_time:.2f} seconds")
     elif st.session_state.finished:

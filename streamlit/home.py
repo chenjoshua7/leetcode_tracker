@@ -50,7 +50,7 @@ def home_page(df_filtered):
         for _ in range(4):
             st.write("")
             
-        st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>LeetCode Habits</h4>", unsafe_allow_html = True)
+        #st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>LeetCode Habits</h4>", unsafe_allow_html = True)
         for _ in range(2):
             st.write("")
         # Plot the distribution using a histogram

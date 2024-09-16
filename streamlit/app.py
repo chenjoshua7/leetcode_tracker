@@ -2,21 +2,27 @@ import streamlit as st
 from home import home_page
 from scraper import scraper_page
 from header import header
+from sidebar import sidebar
+from skills import skills_page
+from time_page import time_page
 
 # Ensure set_page_config is called only once at the start
 st.set_page_config(layout="wide")
 
-# Sidebar for page navigation
-with st.sidebar:
-    st.markdown("<h1 style='text-align: center; padding: 20px 0;'>Mavigation</h1>", unsafe_allow_html=True) 
-    page_selection = st.selectbox("Select a page", ["Home", "Scraper"], index=0)
+df_filtered = sidebar()
 
+# Sidebar for page navigation
 header()
 
+with st.container():
+    page_selection = st.selectbox("", ["Completion Breakdown", "Skills Breakdown", "Input Data"], index=0)
+
 # Load the appropriate page based on the selection
-if page_selection == "Home":
-    home_page()
-elif page_selection == "Scraper":
+if page_selection == "Completion Breakdown":
+    time_page(df_filtered)
+elif page_selection == "Skills Breakdown":
+    skills_page(df_filtered)
+elif page_selection == "Input Data":
     scraper_page()
 
 with st.expander("About this Project", expanded=False):

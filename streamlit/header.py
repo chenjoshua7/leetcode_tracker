@@ -3,7 +3,7 @@ from etl import DataQuerier
 from helper_functions import get_current_streak, get_daily_question
 from queries import streak_query, streak_gpt_query
 
-@st.cache_data(ttl=1) 
+@st.cache_data(ttl=300) 
 def get_data_from_db():
     querier = DataQuerier()
 

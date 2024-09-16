@@ -113,7 +113,7 @@ def scraper_page():
                 For those interested in setting this up for personal use, the GitHub repository is linked in the sidebar. You can begin by following the steps in the `AWS_setup` Jupyter Notebook.
                 The error shown in the video occurs because I have already completed today's daily problem.
                 """)
-    st.video("example.mov")
+    st.video("example.mp4")
     
     if "start_time" not in st.session_state:
         st.session_state.start_time = None

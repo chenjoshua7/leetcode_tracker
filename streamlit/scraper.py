@@ -18,11 +18,10 @@ class LeetCodeDailyScraper:
         url = "https://leetcode.com/problemset/"
         
         chrome_options = Options()
-        chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-        chrome_options.add_argument("--disable-gpu")  # Disable GPU usage
-        chrome_options.add_argument("--no-sandbox")  # Required for some environments
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        
+        chrome_options.add_argument("--disable-gpu")
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         driver.get(url)
 
@@ -101,70 +100,103 @@ def load_into_sql(info):
 
 # Streamlit App
 def scraper_page():
-    sidebar()
-    st.title("LeetCode Daily Problem Scraper")
+    st.subheader("LeetCode Daily Problem Scraper")
 
     if "start_time" not in st.session_state:
         st.session_state.start_time = None
     if "stop_time" not in st.session_state:
         st.session_state.stop_time = None
+    if "paused_time" not in st.session_state:
+        st.session_state.paused_time = None
+    if "elapsed_time" not in st.session_state:
+        st.session_state.elapsed_time = 0
     if "daily_problem" not in st.session_state:
         st.session_state.daily_problem = None
-
+    if "finished" not in st.session_state:
+        st.session_state.finished = False
+    if "timer_active" not in st.session_state:
+        st.session_state.timer_active = False
+    
     # Scrape today's problem
-    if st.button("Scrape Today's Problem"):
+    if st.button("Start Today's Problem") and not st.session_state.finished:
         scraper = LeetCodeDailyScraper()
         st.session_state.daily_problem = scraper.run()
+    
+    if not st.session_state.daily_problem:
+        for i in range(20):
+            st.write("")
+            
+
 
     # Display the scraped problem info if available
     if st.session_state.daily_problem:
+        space1, c1, c2, c3, space2 = st.columns([0.01, 0.3, 0.2, 0.2, 0.5])
         daily_problem = st.session_state.daily_problem
-        st.write(f"**Problem ID**: {daily_problem[0]}")
-        st.write(f"**Problem Name**: {daily_problem[1]}")
-        st.write(f"**Acceptance Rate**: {daily_problem[2]}")
-        st.write(f"**Complexity**: {daily_problem[3]}")
+        c1.write(f"{daily_problem[0]}. {daily_problem[1]}")
+        c2.write(f"Acceptance: {daily_problem[2]}%")
+        c3.write(f"Complexity: {daily_problem[3]}")
+        st.session_state.start_time = time.time() - st.session_state.elapsed_time
+        st.session_state.timer_active = True
 
-        # Start the timer if not already started
-        if st.session_state.start_time is None:
-            if st.button("Start Timer"):
-                st.session_state.start_time = time.time()
+    # Timer controls: Start, Pause, Stop
+    placeholder = st.empty()
 
-    # Show stop button if timer has started
-    if st.session_state.start_time and st.session_state.stop_time is None:
-        if st.button("Stop Timer"):
-            st.session_state.stop_time = time.time()
+    # Continuously update elapsed time if timer is running
+    if st.session_state.timer_active:
+        st.session_state.elapsed_time = time.time() - st.session_state.start_time
+        placeholder.write(f"Elapsed time: {st.session_state.elapsed_time:.2f} seconds")
+    elif st.session_state.finished:
+        placeholder.write(f"Final time: {st.session_state.elapsed_time:.2f} seconds")  # Keep showing final time after stop
 
-    # After stopping the timer, display the fields for entering additional info
-    if st.session_state.stop_time:
-        elapsed_time = st.session_state.stop_time - st.session_state.start_time
-        st.write(f"Time taken: {elapsed_time:.2f} seconds")
+    # Stop button logic
+    if st.session_state.daily_problem:
+        if st.button("Stop Timer") and not st.session_state.finished:
+            if st.session_state.start_time:
+                st.session_state.stop_time = time.time()
+                st.session_state.elapsed_time = st.session_state.stop_time - st.session_state.start_time
+                st.session_state.timer_active = False
+                st.session_state.finished = True
+                placeholder.write(f"Final time: {st.session_state.elapsed_time:.2f} seconds")  # Show final time after stopping
 
-        # Input fields for additional info
-        speed = st.number_input('Input Speed (in ms):', min_value=0.0, step=1.0)
-        memory = st.number_input('Input Memory (in MB):', min_value=0.0, step=1.0)
-        gpt_used = st.checkbox("Did you use ChatGPT?")
-        skills = st.text_input("Enter the skills used (comma separated):")
-        notes = st.text_area("Enter any notes:", "")
+        # Continuously update elapsed time if timer is running
+        if st.session_state.start_time and st.session_state.paused_time is None and not st.session_state.finished:
+            while st.session_state.timer_active:
+                st.session_state.elapsed_time = time.time() - st.session_state.start_time
+                placeholder.write(f"Elapsed time: {st.session_state.elapsed_time:.2f} seconds")
+                time.sleep(0.01)
+        else:
+            placeholder.write(f"Final time: {st.session_state.elapsed_time:.2f} seconds")
+
+    if st.session_state.finished:
+        space, input_data, space2 = st.columns([0.3, 1, 0.3])
+
+        speed = input_data.number_input('Input Speed (in %):', min_value=0.0, step=1.0)
+        memory = input_data.number_input('Input Memory (in %):', min_value=0.0, step=1.0)
+        gpt_used = input_data.checkbox("Did you use ChatGPT?")
+        skills = input_data.text_input("Enter the skills used (comma separated):")
+        notes = input_data.text_area("Enter any notes:", "")
 
         # Submit button to save the data to the database
-        if st.button("Submit Data"):
+        if input_data.button("Submit Data"):
             info = GetInformation(st.session_state.daily_problem)
-            info.time = elapsed_time
+            info.time = st.session_state.elapsed_time
             info.speed = speed
             info.memory = memory
             info.gpt = 1 if gpt_used else 0
             info.skills = skills
             info.notes = notes
-            info.start_time = datetime.fromtimestamp(st.session_state.start_time).strftime('%Y-%m-%d %H:%M:%S')
+            info.start_time = datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
             # Load data into SQL
             load_into_sql(info)
-            st.success("Data loaded successfully into SQL.")
-            
+            input_data.success("Data loaded successfully into SQL.")
+
             # Reset session state after submission
             st.session_state.start_time = None
             st.session_state.stop_time = None
+            st.session_state.paused_time = None
             st.session_state.daily_problem = None
+            st.session_state.finished = False  # Reset the finished state
 
 if __name__ == '__main__':
-    scraper()
+    scraper_page()

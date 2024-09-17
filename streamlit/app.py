@@ -7,12 +7,15 @@ from skills import skills_page
 from time_page import time_page
 from predictions import prediction_page
 from model.preprocessor import PreprocessData
-from querier import querier_page
+from streamlit.querier import querier_page
 
 # Ensure set_page_config is called only once at the start
 st.set_page_config(layout="wide")
-df_filtered = sidebar()
 
+st.title("LC Daily Prob Tracker and Analysis")
+
+
+df_filtered = sidebar()
 
 # Sidebar for page navigation
 header()

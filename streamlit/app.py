@@ -11,7 +11,7 @@ from querier import querier_page
 
 # Ensure set_page_config is called only once at the start
 st.set_page_config(
-    page_title="LC Daily Prob Dashboard",
+    page_title="LeetCode Dashboard",
     page_icon="https://raw.githubusercontent.com/jdneo/vscode-leetcode/master/resources/LeetCode.png",
     layout="wide")
 

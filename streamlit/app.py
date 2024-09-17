@@ -11,6 +11,17 @@ from model.preprocessor import PreprocessData
 # Ensure set_page_config is called only once at the start
 st.set_page_config(layout="wide")
 
+import streamlit as st
+from datetime import datetime
+import pytz
+
+# Get the current time in UTC
+utc_time = datetime.utcnow()
+
+# Convert UTC to US Eastern Time
+eastern_tz = pytz.timezone('US/Eastern')
+eastern_time = utc_time.replace(tzinfo=pytz.utc).astimezone(eastern_tz)
+
 df_filtered = sidebar()
 
 # Sidebar for page navigation

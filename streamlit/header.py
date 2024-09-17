@@ -2,6 +2,12 @@ import streamlit as st
 from etl import DataQuerier
 from helper_functions import get_current_streak, get_daily_question
 from queries import streak_query, streak_gpt_query
+from datetime import datetime
+import pytz
+
+utc_time = datetime.utcnow()
+eastern_tz = pytz.timezone('US/Eastern')
+eastern_time = utc_time.replace(tzinfo=pytz.utc).astimezone(eastern_tz)
 
 @st.cache_data(ttl=300) 
 def get_data_from_db():

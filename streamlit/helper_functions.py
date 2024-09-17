@@ -1,5 +1,10 @@
 import re
 from datetime import datetime, timedelta
+import pytz
+
+utc_time = datetime.utcnow()
+eastern_tz = pytz.timezone('US/Eastern')
+eastern_time = utc_time.replace(tzinfo=pytz.utc).astimezone(eastern_tz)
 
 def wrap_text(text, length=50):
     # Split text without breaking words unless necessary, handling ellipses and dashes

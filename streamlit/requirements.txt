@@ -12,4 +12,4 @@ streamlit-toggle-switch==1.0.2
 streamlit-vertical-slider==2.5.5
 selenium==4.15.0
 webdriver-manager==4.0.0
-scikit-learn==1.5.2
+scikit-learn==1.4.0

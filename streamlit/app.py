@@ -31,7 +31,8 @@ elif page_selection == "Skills Breakdown":
     skills_page(df_filtered)
 elif page_selection == "Daily Problem Tracker":
     tracker_page()
-
+elif page_selection == "Open Querier":
+    querier_page()
 
 with st.expander("About this Project", expanded=False):
         st.markdown("""

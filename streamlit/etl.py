@@ -45,11 +45,8 @@ class DataQuerier:
     
     def close(self):
         self.connection.close()
-        
-      
 
 ### my first class for when I was using a local server  
-        
 class ETL:
     def __init__(self) -> None:
         self.df = None

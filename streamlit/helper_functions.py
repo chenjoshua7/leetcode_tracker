@@ -41,8 +41,11 @@ def get_current_streak(streak_data):
     # Extract the end_date of the most recent streak and convert it to a date object
     end_date = streak_data["end_date"][0].date()
 
-    # Check if the most recent streak ended today or yesterday
-    if end_date == today or end_date == yesterday:
+    # Check if the most recent streak ended today
+    if end_date == today:
+        return streak_data["streak_length"][0]
+    # If today is not part of the streak, check for yesterday's date
+    elif end_date == yesterday:
         return streak_data["streak_length"][0]
     else:
         return 0
@@ -86,7 +89,7 @@ def create_temporary_table(connection, start_date, end_date, complexity)-> None:
         create_temp_table= f"""
             CREATE TEMPORARY TABLE filtered_data AS
                 SELECT * FROM daily_problems
-                WHERE date BETWEEN '{start_date_str}' AND '{end_date_str}'
+                WHERE date BETWEEN '{start_date_str}' AND '{end_date_str}' + INTERVAL 1 DAY
                 AND complexity IN ({complexity_str});
         """
         cursor.execute(create_temp_table)

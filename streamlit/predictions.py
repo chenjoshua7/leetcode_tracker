@@ -6,7 +6,7 @@ from model.preprocessor import PreprocessData
 from datetime import datetime, timedelta
 import pandas as pd
 import plotly.express as px
-import os
+import joblib
 
 # Function to convert time in seconds to minutes and seconds format
 def convert_seconds(time) -> str:
@@ -53,12 +53,10 @@ def prediction_page(df_filtered):
     model_path = 'pipeline_model.pkl'
 
     try:
-        with open(model_path, 'rb') as f:
-            pipeline = pickle.load(f)
+        pipeline = joblib.load('pipeline_model.joblib')
     except FileNotFoundError:
         st.error(f"Model file not found at path: {model_path}")
-        return
-
+    
     # Date logic: filter today's and yesterday's data
     today = datetime.now().date()
     df_filtered = df_filtered.sort_values("date", ascending=False)

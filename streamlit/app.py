@@ -1,28 +1,18 @@
 import streamlit as st
 from home import home_page
-from scraper import scraper_page
+from tracker import tracker_page
 from header import header
 from sidebar import sidebar
 from skills import skills_page
 from time_page import time_page
 from predictions import prediction_page
 from model.preprocessor import PreprocessData
+from datetime import datetime
 
 # Ensure set_page_config is called only once at the start
 st.set_page_config(layout="wide")
-
-import streamlit as st
-from datetime import datetime
-import pytz
-
-# Get the current time in UTC
-utc_time = datetime.utcnow()
-
-# Convert UTC to US Eastern Time
-eastern_tz = pytz.timezone('US/Eastern')
-eastern_time = utc_time.replace(tzinfo=pytz.utc).astimezone(eastern_tz)
-
 df_filtered = sidebar()
+
 
 # Sidebar for page navigation
 header()
@@ -40,7 +30,7 @@ elif page_selection == "Completion Time Breakdown":
 elif page_selection == "Skills Breakdown":
     skills_page(df_filtered)
 elif page_selection == "Daily Problem Tracker":
-    scraper_page()
+    tracker_page()
 
 with st.expander("About this Project", expanded=False):
         st.markdown("""

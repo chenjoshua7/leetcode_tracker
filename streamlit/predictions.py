@@ -9,31 +9,12 @@ import plotly.express as px
 import json
 from sklearn.linear_model import LinearRegression
 
+
 # Function to convert time in seconds to minutes and seconds format
 def convert_seconds(time) -> str:
     min, sec = divmod(int(time), 60)
     return f"{min} Minutes, {sec} Seconds"
 
-def plot_performance(y_pred, actual_time):
-    # Prepare data for the plot
-    data = pd.DataFrame({
-        'Index': list(range(len(y_pred))),  # Creating index for x-axis
-        'Predicted Time': y_pred.flatten(),  # Flatten in case of array-like predictions
-        'Actual Time': actual_time
-    })
-
-    # Melt the DataFrame for plotly
-    df_long = data.melt(id_vars=['Index'], value_vars=['Predicted Time', 'Actual Time'],
-                        var_name='Metric', value_name='Time (seconds)')
-
-    # Create a line chart
-    fig = px.line(df_long, x='Index', y='Time (seconds)', color='Metric',
-                  title="Predicted vs Actual Time", markers=True)
-
-    fig.update_layout(xaxis_title="Index", yaxis_title="Time (seconds)")
-
-    # Display the plot
-    st.plotly_chart(fig)
     
 # Function to render the prediction page
 def prediction_page(df_filtered):
@@ -58,22 +39,22 @@ def prediction_page(df_filtered):
 
     # Date logic: filter today's and yesterday's data
     today = datetime.now().date()
-    df_filtered = df_filtered.sort_values("date", ascending=False)
     
+    df_filtered = df_filtered.sort_values("date", ascending=False).reset_index(drop=True)
+
     # Check if there's data available for today
     if df_filtered['date'][0].date() == today:
         # Make prediction based on the most recent 4 records
         pipeline.fit(df_filtered, df_filtered["time"])
-        y_pred = pipeline.predict(df_filtered.iloc[0:4, :])
+        y_pred = pipeline.predict(df_filtered)
         actual_time = df_filtered["time"]
+        df_filtered["predicted"] = y_pred
 
         # Determine color (goal achieved or not)
         if y_pred[0] > actual_time[0]:
             color = "green"
-            status_message = "Great job! You've surpassed today's goal! 🎉"
         else:
             color = "red"
-            status_message = "Keep going! You can still reach today's goal! 💪"
 
         # Calculate standard deviation for the time data
         std_dev = df_filtered["time"].std()/2
@@ -101,10 +82,14 @@ def prediction_page(df_filtered):
             else:
                 feedback_message = "Oof, rough day... 😅"
         st.markdown(f"<h4 style='text-align: center; color: {color};'>{feedback_message}</h4>", unsafe_allow_html=True)
-        plot_performance(y_pred[::-1], actual_time[::-1][:4])
+        
+        predict_fig = px.line(data_frame=df_filtered, x="date", y=["predicted", "time"])
+        st.plotly_chart(predict_fig)
+
     else:
         st.warning("No data available for today. Daily Problem not yet completed.")
         
+    
 if __name__ == '__main__':
     import pandas as pd
     data = {

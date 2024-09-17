@@ -6,7 +6,8 @@ from model.preprocessor import PreprocessData
 from datetime import datetime, timedelta
 import pandas as pd
 import plotly.express as px
-import joblib
+import json
+from sklearn.linear_model import LinearRegression
 
 # Function to convert time in seconds to minutes and seconds format
 def convert_seconds(time) -> str:
@@ -38,7 +39,7 @@ def plot_performance(y_pred, actual_time):
 def prediction_page(df_filtered):
     # Page title and description
     st.markdown("<h2 style='text-align: center; padding-bottom: 10px;'>Today's Performance Review</h2>", unsafe_allow_html=True)
-    st.info("🚧 This page is a work in progress 🚧", icon="🚧")
+    st.info("This page is a work in progress", icon="🚧")
     
     st.markdown("""
         To better track my daily performance, I'm building a model that predicts my progress. The goal is to eventually surpass 
@@ -49,14 +50,12 @@ def prediction_page(df_filtered):
         and techniques, such as clustering to identify patterns in similar types of problems.
     """)
     
-    # Load the pre-trained model pipeline
-    model_path = 'pipeline_model.pkl'
+    # Reconstruct the linear regression model
+    pipeline = Pipeline(steps=[
+        ('preprocessor', PreprocessData()),
+        ('regressor', LinearRegression())
+    ])
 
-    try:
-        pipeline = joblib.load('pipeline_model.joblib')
-    except FileNotFoundError:
-        st.error(f"Model file not found at path: {model_path}")
-    
     # Date logic: filter today's and yesterday's data
     today = datetime.now().date()
     df_filtered = df_filtered.sort_values("date", ascending=False)
@@ -64,6 +63,7 @@ def prediction_page(df_filtered):
     # Check if there's data available for today
     if df_filtered['date'][0].date() == today:
         # Make prediction based on the most recent 4 records
+        pipeline.fit(df_filtered, df_filtered["time"])
         y_pred = pipeline.predict(df_filtered.iloc[0:4, :])
         actual_time = df_filtered["time"]
 

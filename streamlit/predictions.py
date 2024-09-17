@@ -83,9 +83,40 @@ def prediction_page(df_filtered):
                 feedback_message = "Oof, rough day... 😅"
         st.markdown(f"<h4 style='text-align: center; color: {color};'>{feedback_message}</h4>", unsafe_allow_html=True)
         
-        predict_fig = px.line(data_frame=df_filtered, x="date", y=["predicted", "time"])
-        st.plotly_chart(predict_fig)
+        # Add a slider to select how many rows to display
+        row_count = st.slider('Select number of rows to display', min_value=3, max_value=len(df_filtered), value=5, step=1)
 
+        # Filter the DataFrame based on slider value
+        df_filtered_slider = df_filtered.head(row_count)
+
+        # Create the line plot
+        predict_fig = px.line(
+            data_frame=df_filtered_slider, 
+            x="date", 
+            y=["predicted", "time"],  # Both predicted and actual time
+            labels={'time': 'Completion Time', 'predicted': 'Predicted Time', 'date': 'Date', 'complexity': 'Complexity'},
+            hover_data={'id': True, 'name': True, 'complexity': True, 'notes': True}
+        )
+
+        # Customize the figure layout for a nicer appearance and unified hovermode
+        predict_fig.update_layout(
+            title="Predicted vs Actual Time over Date",
+            xaxis_title="Date",
+            yaxis_title="Time (Seconds)",
+            hovermode="x unified",  # Show one hover box per x value
+            template="plotly_white"  # Use a clean template
+        )
+
+        # Apply a hovertemplate to present data in a compact single-line text format
+        predict_fig.update_traces(
+            mode="markers+lines",
+            hovertemplate=(
+                "On %{x}, you predicted %{y[0]} seconds, but completed in %{y[1]} seconds.<br>"
+                "Complexity: %{customdata[2]}<br>"
+                "Notes: %{customdata[3]}<extra></extra>"
+            )
+        )
+        st.plotly_chart(predict_fig)
     else:
         st.warning("No data available for today. Daily Problem not yet completed.")
         

@@ -7,6 +7,7 @@ from skills import skills_page
 from time_page import time_page
 from predictions import prediction_page
 from model.preprocessor import PreprocessData
+from querier import querier_page
 
 # Ensure set_page_config is called only once at the start
 st.set_page_config(layout="wide")
@@ -17,7 +18,7 @@ df_filtered = sidebar()
 header()
 
 with st.container():
-    page_selection = st.selectbox("Page Selection", ["Home", "Daily Problem Tracker", "Today's Performance Review", "Completion Time Breakdown", "Skills Breakdown"], index=0)
+    page_selection = st.selectbox("Page Selection", ["Home", "Daily Problem Tracker", "Today's Performance Review", "Completion Time Breakdown", "Skills Breakdown", "Open Querier"], index=0)
 
 # Load the appropriate page based on the selection
 if page_selection == "Home":
@@ -30,6 +31,8 @@ elif page_selection == "Skills Breakdown":
     skills_page(df_filtered)
 elif page_selection == "Daily Problem Tracker":
     tracker_page()
+elif page_selection == "Open Querier":
+    querier_page()
 
 with st.expander("About this Project", expanded=False):
         st.markdown("""

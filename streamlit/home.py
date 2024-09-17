@@ -35,7 +35,7 @@ def home_page(df_filtered):
                     In addition to tracking performance, the dashboard includes a tool that automatically scrapes daily LeetCode problem data, allowing for easy submission and progress tracking through a user-friendly interface.
 
                     ### Time Prediction Benchmark
-                    One key feature of this dashboard is a time predictor built with XGBoost. This model estimates the expected time to solve a problem, and I use it as a benchmark. Beating the predicted time is considered a win, while missing the benchmark signals the need for more practice.
+                    One key feature of this dashboard is a time predictor built. This model estimates the expected time to solve a problem, and I use it as a benchmark. Beating the predicted time is considered a win, while missing the benchmark signals the need for more practice.
 
                     ### Dashboard Sections:
                     - **Completion Time Analysis**: While completion time alone doesn’t always provide a complete picture—since some problems don’t require the most efficient solution—it still serves as a solid metric for evaluating performance.

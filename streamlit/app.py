@@ -10,9 +10,11 @@ from model.preprocessor import PreprocessData
 from querier import querier_page
 
 # Ensure set_page_config is called only once at the start
-st.set_page_config(layout="wide")
+st.set_page_config(
+    page_title="LC Daily Prob Dashboard",
+    page_icon="https://raw.githubusercontent.com/jdneo/vscode-leetcode/master/resources/LeetCode.png",
+    layout="wide")
 
-st.title("LC Daily Prob Tracker and Analysis")
 
 
 df_filtered = sidebar()

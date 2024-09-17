@@ -94,8 +94,7 @@ def prediction_page(df_filtered):
             data_frame=df_filtered_slider, 
             x="date", 
             y=["predicted", "time"],  # Both predicted and actual time
-            labels={'time': 'Completion Time', 'predicted': 'Predicted Time', 'date': 'Date', 'complexity': 'Complexity'},
-            hover_data={'id': True, 'name': True, 'complexity': True, 'notes': True}
+
         )
 
         # Customize the figure layout for a nicer appearance and unified hovermode
@@ -110,11 +109,6 @@ def prediction_page(df_filtered):
         # Apply a hovertemplate to present data in a compact single-line text format
         predict_fig.update_traces(
             mode="markers+lines",
-            hovertemplate=(
-                "On %{x}, you predicted %{y[0]} seconds, but completed in %{y[1]} seconds.<br>"
-                "Complexity: %{customdata[2]}<br>"
-                "Notes: %{customdata[3]}<extra></extra>"
-            )
         )
         st.plotly_chart(predict_fig)
     else:

@@ -50,37 +50,38 @@ def home_page(df_filtered):
         for _ in range(4):
             st.write("")
             
-        #st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>LeetCode Habits</h4>", unsafe_allow_html = True)
-        for _ in range(2):
-            st.write("")
-        # Plot the distribution using a histogram
-        fig = px.histogram(
-            df_filtered, 
-            x='time_15min', 
-            nbins=96,  # 96 intervals in a 24-hour day (24 hours * 4 per hour)
-            title='LeetCode Time of Day Distribution',
-        )
-        
-        # Update layout settings for better formatting
-        fig.update_layout(
-            bargap=0.2,  # Space between bars
-            margin=dict(l=10, r=10, t=30, b=0),  # Customize margins
-            xaxis_title=None,  # Remove x-axis title
-            yaxis_title=None,  # Remove y-axis title
-            height=230,  # Set figure height
-        ).update_yaxes(
-            showgrid=False,  # Remove gridlines from y-axis
-            showticklabels=False  # Hide y-axis labels
-        )
-        
-        # Display the plot in Streamlit
-        st.plotly_chart(fig)
+    
 
         #### Complexity
-
         complexity_counts = df_filtered.groupby("complexity").size()
+        gpt_counts = df_filtered.groupby("chat_gpt").size()
 
         # Plot a pie chart with Plotly inside a container
+        st.write("")
+        with st.container():
+            gpt_counts.index = gpt_counts.index.map({0: "Didn't Use", 1: "Used ChatGPT"})
+            gpt_fig = px.pie(gpt_counts, 
+                                    names=gpt_counts.index, 
+                                    values=gpt_counts.values,
+                                    height = 250)
+            
+            gpt_fig.update_layout(
+                    margin=dict(l=10, r=10, t=30, b=0),
+                    xaxis_title=None,
+                    yaxis_title=None,
+                    title = "GPT Usage Breakdown",
+                    height=230,
+                ).update_yaxes(
+                    showgrid=False,
+                    showticklabels=False
+                )
+                
+            gpt_fig.update_traces(hovertemplate="GPT: %{label} <br> Count: %{value}")
+                
+            st.plotly_chart(gpt_fig)
+            
+
+
         with st.container():
             complexity_fig = px.pie(complexity_counts, 
                                     names=complexity_counts.index, 
@@ -89,18 +90,48 @@ def home_page(df_filtered):
             
             complexity_fig.update_layout(
                     bargap=0.2,  # Space between bars
-                    margin=dict(l=10, r=10, t=30, b=0),  # Customize margins
-                    xaxis_title=None,  # Remove x-axis title
-                    yaxis_title=None,  # Remove y-axis title
-                    height=230,  # Set figure height
+                    margin=dict(l=10, r=10, t=30, b=0),
+                    xaxis_title=None,  
+                    yaxis_title=None,
+                    height=230, 
                 ).update_yaxes(
-                    showgrid=False,  # Remove gridlines from y-axis
-                    showticklabels=False  # Hide y-axis labels
+                    showgrid=False,
+                    showticklabels=False 
                 )
 
-            # Update the hover template for the pie chart
             complexity_fig.update_traces(hovertemplate="Complexity: %{label} <br> Count: %{value}")
-
+            
             # Display the pie chart in Streamlit
             st.plotly_chart(complexity_fig)
             st.write("")
+        
+         #st.markdown("<h4 style='text-align: center; padding-bottom: 10px;'>LeetCode Habits</h4>", unsafe_allow_html = True)
+        for _ in range(2):
+            st.write("")
+        # Plot the distribution using a histogram
+
+    
+    st.write("")
+    st.write("")
+    st.write("")
+    
+    fig = px.histogram(
+            df_filtered, 
+            x='time_15min', 
+            nbins=96,  # 96 intervals in a 24-hour day (24 hours * 4 per hour)
+            title='When I Do LeetCode',
+        )
+    
+    fig.update_layout(
+        bargap=0.2,  
+        margin=dict(l=10, r=10, t=30, b=0),
+        xaxis_title=None,
+        yaxis_title=None,
+        height=230, 
+    ).update_yaxes(
+        showgrid=False, 
+        showticklabels=False
+    )
+    
+    # Display the plot in Streamlit
+    st.plotly_chart(fig)

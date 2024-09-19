@@ -93,6 +93,7 @@ def home_page(df_filtered):
                     margin=dict(l=10, r=10, t=30, b=0),
                     xaxis_title=None,  
                     yaxis_title=None,
+                    title = "Complexity Breakdown",
                     height=230, 
                 ).update_yaxes(
                     showgrid=False,

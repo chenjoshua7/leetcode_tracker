@@ -1,7 +1,7 @@
 streak_query = f"""WITH ranked_data AS (
                         SELECT 
                             *,
-                            LAG(CAST(date AS DATE), 1) OVER (ORDER BY date ASC) AS prev_date
+                            LAG(CAST(date AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York' AS DATE), 1) OVER (ORDER BY date ASC) AS prev_date
                         FROM 
                             daily_problems
                     ),

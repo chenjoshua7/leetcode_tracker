@@ -45,8 +45,7 @@ def prediction_page(df_filtered):
 
     # Check if there's data available for today
     if df_filtered['date'][0].date() == today:
-        # Make prediction based on the most recent 4 records
-        pipeline.fit(df_filtered, df_filtered["time"])
+        pipeline.fit(df_filtered[:len(df_filtered)], df_filtered["time"][:len(df_filtered)])
         y_pred = pipeline.predict(df_filtered)
         actual_time = df_filtered["time"]
         df_filtered["predicted"] = y_pred
@@ -69,7 +68,7 @@ def prediction_page(df_filtered):
         feedback_message = ""
         
         if time_difference <= 0.5 * std_dev:
-            feedback_message = "Nicely Done! 👍"
+            feedback_message = "Right On Track! 👍"
         elif time_difference <= 1 * std_dev:
             feedback_message = "Not bad, I was close! 😊"
         elif time_difference <= 1.5 * std_dev:
@@ -82,7 +81,17 @@ def prediction_page(df_filtered):
                 feedback_message = "WOW! That was lightning fast! ⚡️"
             else:
                 feedback_message = "Oof, rough day... 😅"
+                
+        if df_filtered.loc[0,"chat_gpt"] == 1:
+            feedback_message = "ChatGPT? I'm not mad... just disappointed 😠"
+            color = "red"
+            
+    
+            
         st.markdown(f"<h4 style='text-align: center; color: {color};'>{feedback_message}</h4>", unsafe_allow_html=True)
+        
+        st.write("")
+        st.write("")
         
         # Add a slider to select how many rows to display
         row_count = st.slider('Select number of rows to display', min_value=3, max_value=len(df_filtered), value=5, step=1)

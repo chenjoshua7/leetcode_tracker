@@ -30,8 +30,6 @@ def header():
     current_streak = get_current_streak(streaks)
 
     #gpt_streak = get_current_streak(gpt_streaks)
-    st.write(eastern_time.date())
-    st.write(df.loc[0, "date"].date())
     if df.loc[0, "date"].date() == eastern_time.date() and df.loc[0,"chat_gpt"] == 1:
         gpt_streak = 0 
         

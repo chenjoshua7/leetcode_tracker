@@ -25,16 +25,21 @@ def header():
     # Retrieve data using cached query
     df, question_count, streaks, gpt_streaks = get_data_from_db()
     gpt_streak  = get_current_streak(gpt_streaks)
-
     
     # Get streak data
     current_streak = get_current_streak(streaks)
 
     #gpt_streak = get_current_streak(gpt_streaks)
+    st.write(eastern_time.date())
+    st.write(df.loc[0, "date"].date())
+    if df.loc[0, "date"].date() == eastern_time.date() and df.loc[0,"chat_gpt"] == 1:
+        gpt_streak = 0 
+        
     max_streak = max(streaks["streak_length"])
 
     # Daily question info
     daily_question = get_daily_question(df)
+    
     # Title and description
     st.markdown("""
         <div style="text-align: center;">
@@ -55,7 +60,7 @@ def header():
         <div style='text-align:center; margin-bottom: 20px; width:100%; background-color: #2d2d2d; padding: 20px 30px 10px 30px; border-radius: 15px; 
                     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);'>
             <p style='font-size: 16px; font-weight: 600; color: #f9f9f9; margin-bottom: 5px;'>Current Streak: {current_streak} days</p>
-            <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>No-GPT Streak: {gpt_streak} days</p>
+            <p style='font-size: 15px; color: #dddddd; margin-bottom: 5px;'>No-GPT Streak: {gpt_streak} days {"😠" if gpt_streak == 0 else ""}</p>
             <p style='font-size: 15px; color: #dddddd;'>Longest Streak: {max_streak} days</p>
         </div>
         """, unsafe_allow_html=True)

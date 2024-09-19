@@ -8,7 +8,7 @@ import pandas as pd
 import plotly.express as px
 import json
 from sklearn.linear_model import LinearRegression
-
+import pytz
 
 # Function to convert time in seconds to minutes and seconds format
 def convert_seconds(time) -> str:
@@ -38,7 +38,8 @@ def prediction_page(df_filtered):
     ])
 
     # Date logic: filter today's and yesterday's data
-    today = datetime.now().date()
+    est = pytz.timezone('America/New_York')
+    today = datetime.now(pytz.utc).astimezone(est).date()
     
     df_filtered = df_filtered.sort_values("date", ascending=False).reset_index(drop=True)
 

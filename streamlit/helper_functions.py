@@ -57,7 +57,8 @@ def get_current_streak(streak_data):
     
 def get_daily_question(data):
     # Get today's date and yesterday's date
-    today = datetime.now().date()
+    est = pytz.timezone('America/New_York')
+    today = datetime.now(pytz.utc).astimezone(est).date()
     
     top_row = data.iloc[0,:]
     

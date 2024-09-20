@@ -43,25 +43,34 @@ def prediction_page(df_filtered):
     
     df_filtered = df_filtered.sort_values("date", ascending=False).reset_index(drop=True)
 
+    
     # Check if there's data available for today
-    if df_filtered['date'][0].date() == today:
-        pipeline.fit(df_filtered[:len(df_filtered)], df_filtered["time"][:len(df_filtered)])
-        y_pred = pipeline.predict(df_filtered)
-        actual_time = df_filtered["time"]
-        df_filtered["predicted"] = y_pred
-
-        # Determine color (goal achieved or not)
-        if y_pred[0] > actual_time[0]:
+    if df_filtered['date'].iloc[0].date() == today:
+        y_pred = []
+        
+        for i in range(5, len(df_filtered)):
+            X_train = df_filtered.iloc[:i].drop(columns=["time"])
+            y_train = df_filtered.iloc[:i]["time"] 
+            
+            pipeline.fit(X_train, y_train)
+            
+            X_test = df_filtered.iloc[[i]].drop(columns=["time"])
+            prediction = pipeline.predict(X_test)
+            y_pred.append(prediction[0])
+        
+        actual_time = df_filtered.iloc[:-5]["time"].reset_index(drop=True)
+        
+        if y_pred[0] > actual_time.iloc[0]:  
             color = "green"
         else:
             color = "red"
-
+            
         # Calculate standard deviation for the time data
         std_dev = df_filtered["time"].std()/2
         
         # Display goal and actual performance with color coding
         st.markdown(f"<h4 style='text-align: center; color: {color};'>Today's Goal: {convert_seconds(y_pred[0])}</h4>", unsafe_allow_html=True)
-        st.markdown(f"<h4 style='text-align: center; color: {color};'>Actual Time: {convert_seconds(actual_time[0])}</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h4 style='text-align: center; color: {color};'>Actual Time: {convert_seconds(actual_time.iloc[0])}</h4>", unsafe_allow_html=True)
 
         # Determine how far actual time is from predicted time in terms of standard deviations
         time_difference = abs(y_pred[0] - actual_time[0])
@@ -86,19 +95,20 @@ def prediction_page(df_filtered):
             feedback_message = "ChatGPT? I'm not mad... just disappointed 😠"
             color = "red"
             
-    
-            
         st.markdown(f"<h4 style='text-align: center; color: {color};'>{feedback_message}</h4>", unsafe_allow_html=True)
         
         st.write("")
         st.write("")
         
+        df_filtered = df_filtered.iloc[:-5]
+        df_filtered['predicted'] = y_pred
+        
         # Add a slider to select how many rows to display
-        row_count = st.slider('Select number of rows to display', min_value=3, max_value=len(df_filtered), value=5, step=1)
+        row_count = st.slider('Select number of rows to display', min_value=3, max_value=len(df_filtered) - 5, value=5, step=1)
 
         # Filter the DataFrame based on slider value
         df_filtered_slider = df_filtered.head(row_count)
-
+        
         # Create the line plot
         predict_fig = px.line(
             data_frame=df_filtered_slider, 

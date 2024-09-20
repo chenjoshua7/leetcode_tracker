@@ -122,8 +122,8 @@ def prediction_page(df_filtered):
             title="Predicted vs Actual Time over Date",
             xaxis_title="Date",
             yaxis_title="Time (Seconds)",
-            hovermode="x unified",  # Show one hover box per x value
-            template="plotly_white"  # Use a clean template
+            hovermode="x unified", 
+            template="plotly_white"
         )
 
         # Apply a hovertemplate to present data in a compact single-line text format

@@ -38,11 +38,11 @@ def time_page(df_filtered):
         st.markdown("<h3 style='text-align: center; padding-bottom: 15px;'>Performance by Complexity</h3>", unsafe_allow_html=True)
 
         # Group by complexity, calculate mean and standard deviation for each group
-        by_complexity = df_filtered.groupby("complexity")["time"].agg(['mean', 'std'])
-
+        by_complexity = df_filtered.groupby("complexity")["time"].agg(['mean', 'std']).dropna()
+        
         # Organize complexity breakdown into columns
         cols = st.columns(len(by_complexity))
-
+        
         for i, (complexity, stats) in enumerate(by_complexity.iterrows()):
             average = int(stats['mean'])
             stddev = int(stats['std'])
@@ -70,11 +70,11 @@ def time_page(df_filtered):
             "Complexity: %{customdata[2]}<br><br>"
             "Notes:<br>%{customdata[3]}<extra></extra>"
         )
-    ).update_layout(
-        xaxis_title=None,
-        margin=dict(l=10, r=10, t=30, b=30),  # Reduced margins for more compact layout
-        height=400  # Adjust height for a more compact chart
-    )
+        ).update_layout(
+            xaxis_title=None,
+            margin=dict(l=10, r=10, t=30, b=30),  # Reduced margins for more compact layout
+            height=400  # Adjust height for a more compact chart
+        )
     st.plotly_chart(fig, use_container_width=True)
 
     # Add some spacing before Time Distribution

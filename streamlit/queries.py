@@ -16,11 +16,12 @@ streak_query = f"""WITH ranked_data AS (
                     ),
                     streak_groups AS (
                         SELECT *,
-                            SUM(is_new_streak) OVER (ORDER BY date DESC ROWS UNBOUNDED PRECEDING) AS streak_id
+                            SUM(is_new_streak) OVER (ORDER BY date ASC ROWS UNBOUNDED PRECEDING) AS streak_id
                         FROM streaks
                     )
                     SELECT 
                         streak_id,
+                        MIN(date) AS start_date,
                         MAX(date) AS end_date,
                         COUNT(*) AS streak_length
                     FROM 

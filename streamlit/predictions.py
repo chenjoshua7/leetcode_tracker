@@ -64,9 +64,6 @@ def prediction_page(df_filtered):
             color = "green"
         else:
             color = "red"
-            
-        # Calculate standard deviation for the time data
-        std_dev = df_filtered["time"].std()/2
         
         # Display goal and actual performance with color coding
         st.markdown(f"<h4 style='text-align: center; color: {color};'>Today's Goal: {convert_seconds(y_pred[0])}</h4>", unsafe_allow_html=True)
@@ -75,12 +72,12 @@ def prediction_page(df_filtered):
         # Determine how far actual time is from predicted time in terms of standard deviations
         time_difference = abs(y_pred[0] - actual_time[0])
         feedback_message = ""
-        
-        if time_difference <= 0.5 * std_dev:
+
+        if time_difference <= 0.05 * y_pred[0]:
             feedback_message = "Right On Track! 👍"
-        elif time_difference <= 1 * std_dev:
-            feedback_message = "Not bad, I was close! 😊"
-        elif time_difference <= 1.5 * std_dev:
+        elif time_difference <= 0.1 * y_pred[0]:
+            feedback_message = "Not bad, on target! 😊"
+        elif time_difference <= 0.2 * y_pred[0]:
             if y_pred[0] > actual_time[0]:
                 feedback_message = "Super fast! 🚀"
             else:

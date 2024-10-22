@@ -69,7 +69,6 @@ def prediction_page(df_filtered):
         st.markdown(f"<h4 style='text-align: center; color: {color};'>Today's Goal: {convert_seconds(y_pred[0])}</h4>", unsafe_allow_html=True)
         st.markdown(f"<h4 style='text-align: center; color: {color};'>Actual Time: {convert_seconds(actual_time.iloc[0])}</h4>", unsafe_allow_html=True)
 
-        # Determine how far actual time is from predicted time in terms of standard deviations
         time_difference = abs(y_pred[0] - actual_time[0])
         feedback_message = ""
 
